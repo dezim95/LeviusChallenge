@@ -1,0 +1,22 @@
+<h1>Questions</h1>
+
+<table>
+  <thead>
+    <tr>
+      <th>Subject</th>
+      <th>Grade</th>
+      <th>Topic</th>
+      <th>Author</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% @questions.each do |question| %>
+      <tr>
+        <td><%= question.subjects.pluck(:subject).join(', ') %></td>
+        <td><%= question.grade %></td>
+        <td><%= question.topic %></td>
+        <td><%= question.author %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>

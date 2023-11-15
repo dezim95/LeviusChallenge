@@ -1,0 +1,16 @@
+<h1>New Question</h1>
+
+<%= simple_form_for @question do |form| %>
+  <%= form.input :author %>
+  <%= form.collection_check_boxes :subject_ids, Subject.all, :id, :name %>
+  <%= form.input :topic %>
+  <%= form.input :grade %>
+  <%= form.input :statement %>
+
+  <%= form.simple_fields_for :options do |option_form| %>
+    <%= option_form.input :option %>
+    <%= option_form.input :is_correct, as: :boolean %>
+  <% end %>
+
+  <%= form.button :submit, 'Create Question', class: 'btn btn-primary' %>
+<% end %>
