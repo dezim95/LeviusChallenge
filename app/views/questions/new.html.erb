@@ -1,16 +1,29 @@
-<h1>New Question</h1>
-
 <%= simple_form_for @question do |form| %>
   <%= form.input :author %>
-  <%= form.collection_check_boxes :subject_ids, Subject.all, :id, :name %>
+
   <%= form.input :topic %>
   <%= form.input :grade %>
   <%= form.input :statement %>
+
+  <%= form.simple_fields_for :question_subjects do |subject_form| %>
+    <%= 'Matéria(s)' %>
+    <br>
+    <%= subject_form.collection_check_boxes :subject_id, Subject.all, :id, :subject_name, label: 'Subjects', multiple: true, selected: @question.subjects.ids %>
+    <br>
+  <% end %>
+
+  <%= form.simple_fields_for :question_competencies do |competency_form| %>
+    <%= 'Competência(s)' %>
+    <br>
+    <%= competency_form.collection_check_boxes :competency_id, Competency.all, :id, :competency_name, label: 'Competências', multiple: true, selected: @question.competencies.ids %>
+    <br>
+  <% end %>
+
 
   <%= form.simple_fields_for :options do |option_form| %>
     <%= option_form.input :option %>
     <%= option_form.input :is_correct, as: :boolean %>
   <% end %>
 
-  <%= form.button :submit, 'Create Question', class: 'btn btn-primary' %>
+  <%= form.submit 'Create Question', class: 'btn btn-primary' %>
 <% end %>
