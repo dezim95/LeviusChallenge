@@ -30,9 +30,15 @@ class QuestionsController < ApplicationController
   def edit
   end
 
+  def destroy
+    @question = Question.find(params[:id])
+    @question.destroy
+    redirect_to questions_path, notice: 'Question was successfully destroyed.'
+  end
+
   def new
     @question = Question.new
-    4.times { @question.options.build }
+    @question.options.build
     @question.question_subjects.build
     @question.question_competencies.build
   end

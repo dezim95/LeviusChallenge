@@ -24,26 +24,30 @@
 
 <h2>Opções</h2>
 <ol>
+  <% counter = 0 %>
   <% @question.options.each do |option| %>
-    <li><strong>Option:</strong> <%= option.option %></li>
-    <% if option.option_files.attached? %> <!-- Check if option has files attached -->
-      <% option.option_files.each do |image| %> <!-- Iterate over all option files -->
-        <% if image.content_type.starts_with? 'image' %> <!-- Check if file is an image -->
-          <%= image_tag image, alt: 'Option Image', size: "200x200", class: "option-image" %> <!-- Display image with options -->
-        <% elsif image.audio? %>
-          <audio controls>
-            <source src="<%= rails_blob_url(image) %>" type="<%= image.content_type %>"/>
-          </audio>
+    <% counter += 1 %>
+    <li>
+      <strong>Option <%= counter %>:</strong> <%= option.option %>
+      <% if option.option_files.attached? %> <!-- Check if option has files attached -->
+        <% option.option_files.each do |image| %> <!-- Iterate over all option files -->
+          <% if image.content_type.starts_with? 'image' %> <!-- Check if file is an image -->
+            <%= image_tag image, alt: 'Option Image', size: "200x200", class: "option-image" %> <!-- Display image with options -->
+          <% elsif image.audio? %>
+            <audio controls>
+              <source src="<%= rails_blob_url(image) %>" type="<%= image.content_type %>"/>
+            </audio>
           <% elsif image.video? %>
-          <video controls width="480">
-            <source src="<%= rails_blob_url(image) %>" type="<%= image.content_type %>"/>
-          </video>
-        <% else %>
-          <%= link_to image.filename, rails_blob_path(image, disposition: "attachment") %>
+            <video controls width="480">
+              <source src="<%= rails_blob_url(image) %>" type="<%= image.content_type %>"/>
+            </video>
+          <% else %>
+            <%= link_to image.filename, rails_blob_path(image, disposition: "attachment") %>
+          <% end %>
         <% end %>
       <% end %>
-    <% end %>
-    <li><strong>Is Correct:</strong> <%= option.is_correct ? 'Yes' : 'No' %></li>
+      <strong>Is Correct:</strong> <%= option.is_correct ? 'Yes' : 'No' %>
+    </li>
   <% end %>
 </ol>
 

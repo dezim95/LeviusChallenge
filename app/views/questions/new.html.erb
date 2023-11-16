@@ -1,3 +1,4 @@
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 <!-- Include the Quill library -->
 <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
 <script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
@@ -16,7 +17,7 @@
 
   <!-- This hidden field will actually send the data -->
   <%= form.input :statement, as: :hidden %>
-  
+
   <!-- Campo de upload de arquivo abaixo do campo 'Statement' -->
   <div class="field">
     <%= form.label :statement_files, 'Upload de Arquivos para a Questão' %>
@@ -54,7 +55,13 @@
       <%= option_form.label :option_files, 'Upload de Arquivos para a Opção' %>
       <%= option_form.file_field :option_files, multiple: true %>
     </div>
+
+    <!-- Link para remover opção -->
+    <%= link_to 'Remover opção', '#', class: 'remove_option_link' %>
   <% end %>
+
+  <!-- Link para adicionar opção -->
+  <%= link_to 'Adicionar opção', '#', class: 'add_option_link' %>
 
   <%= form.submit 'Criar questão', class: 'btn btn-primary' %>
 <% end %>
@@ -68,4 +75,41 @@
     var statementInput = document.querySelector('input[name="question[statement]"]');
     statementInput.value = quill.root.innerHTML;
   });
+
+  $(document).ready(function() {
+    var optionIndex = $('form .nested-fields').length;
+
+    $('.add_option_link').click(function(e) {
+      e.preventDefault();
+      var optionId = new Date().getTime();
+      var regexp = new RegExp('new_options', 'g');
+      $(this).parent().before(addOption.replace(regexp, optionId));
+      optionIndex++;
+    });
+
+    $(document).on('click', '.remove_option_link', function(e) {
+      e.preventDefault();
+      $(this).prev('input[type=hidden]').val('1');
+      $(this).closest('.nested-fields').hide();
+      optionIndex--;
+    });
+  });
+
+  var addOption = "<div class='nested-fields'> \
+    <div class='field'> \
+      <label for='question_options_attributes_new_options_option'>Opção</label> \
+      <input type='text' name='question[options_attributes][new_options][option]' id='question_options_attributes_new_options_option'> \
+    </div> \
+    <div class='field'> \
+      <label for='question_options_attributes_new_options_is_correct'>É resposta</label> \
+      <input type='hidden' name='question[options_attributes][new_options][is_correct]' value='0'> \
+      <input type='checkbox' value='1' name='question[options_attributes][new_options][is_correct]' id='question_options_attributes_new_options_is_correct'> \
+    </div> \
+    <div class='field'> \
+      <label for='question_options_attributes_new_options_option_files'>Upload de Arquivos para a Opção</label> \
+      <input type='file' multiple='true' name='question[options_attributes][new_options][option_files][]' id='question_options_attributes_new_options_option_files'> \
+    </div> \
+    <input type='hidden' value='false' name='question[options_attributes][new_options][destroy]' id='question_options_attributes_new_options_destroy'> \
+    <a href='#' class='remove_option_link'>Remover opção</a> \
+  </div>";
 </script>
