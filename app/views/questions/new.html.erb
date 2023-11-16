@@ -13,14 +13,22 @@
   <%= form.simple_fields_for :question_subjects do |subject_form| %>
     <%= 'Matéria(s)' %>
     <br>
-    <%= subject_form.collection_check_boxes :subject_id, Subject.all, :id, :subject_name, label: 'Subjects', multiple: true, selected: @question.subjects.ids %>
+     <%= form.collection_check_boxes :subject_ids, Subject.all, :id, :subject_name do |cb| %>
+      <%= cb.check_box %>
+      <%= cb.label %>
+      <br>
+    <% end %>
     <br>
   <% end %>
 
-  <%= form.simple_fields_for :question_competencies do |competency_form| %>
-    <%= 'Competência(s)' %>
+   <%= form.simple_fields_for :question_competencies do |competency_form| %>
+    <%= 'Competencia(s)' %>
     <br>
-    <%= competency_form.collection_check_boxes :competency_id, Competency.all, :id, :competency_name, label: 'Competências', multiple: true, selected: @question.competencies.ids %>
+     <%= form.collection_check_boxes :competency_ids, Competency.all, :id, :competency_name do |cb| %>
+      <%= cb.check_box %>
+      <%= cb.label %>
+      <br>
+    <% end %>
     <br>
   <% end %>
 

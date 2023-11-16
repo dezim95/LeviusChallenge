@@ -41,22 +41,57 @@ class QuestionsController < ApplicationController
     @question = Question.new(question_params)
 
     if @question.save
+      # Ao criar a questão, devemos criar seus models atrelados, Question Subject, Question Competencies
+      build_subject_inventory(@question)
+      build_competency_inventory(@question)
+      build_options_inventory(@question)
       redirect_to @question, notice: 'Question was successfully created.'
     else
       render :new
     end
   end
 
+  def download_pdf
+    send_file '/assets/data/file.pdf', filename: 'file.pdf', type: 'application/pdf', disposition: 'attachment'
+  end
+
   private
+
+  def build_subject_inventory(question)
+    nested_params[:subject_ids].reject!(&:empty?).each do |id|
+      subject = Subject.find(id)
+      QuestionSubject.create!(subject: subject, question: question)
+    end
+  end
+
+  def build_competency_inventory(question)
+    nested_params[:competency_ids].reject!(&:empty?).each do |id|
+      competency = Competency.find(id)
+      QuestionCompetency.create!(competency: competency, question: question)
+    end
+  end
+
+  def build_options_inventory(question)
+    nested_params["options_attributes"].each do |_, obj|
+      option = Option.new(option: obj["option"], is_correct: obj["is_correct"], question: question)
+      option.option_files.attach(obj["option_files"]) if obj["option_files"].present?
+      option.save!
+    end
+  end
 
   def question_params
     params.require(:question).permit(
-      :author, :topic, :grade, :statement,
-      question_subjects_attributes: [:id, :subject_id],
-      question_competencies_attributes: [:id, :competency_id],
-      options_attributes: [:id, :option, :is_correct],
+      :author, :topic, :grade, :statement, :files_type, :files_id, statement_files: [],
+    )
+  end
+
+
+  def nested_params
+    params.require(:question).permit(
+      question_subjects_attributes: [:subject_id],
+      question_competencies_attributes: [:competency_id],
       statement_files: [], # Para arquivos relacionados ao statement
-      options_attributes: [:id, :option, :is_correct, :option_files => []], # Para arquivos relacionados às options
+      options_attributes: [:id, :option, :is_correct, option_files: []], # Para arquivos relacionados às options
       subject_ids: [], # Atributos adicionais permitidos
       competency_ids: [] # Atributos adicionais permitidos
     )

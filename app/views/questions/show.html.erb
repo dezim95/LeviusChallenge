@@ -4,7 +4,13 @@
 <p><strong>Topic:</strong> <%= @question.topic %></p>
 <p><strong>Grade:</strong> <%= @question.grade %></p>
 <p><strong>Statement:</strong> <%= @question.statement %></p>
-
+<h2>Images</h2>
+<% if @question.statement_files.attached? %>
+  <% image = @question.statement_files.first %>
+  <%= image_tag image, alt: 'Question Image' %>
+<% else %>
+  <p>No images attached to this question.</p>
+<% end %>
 <h2>Subjects</h2>
 <ul>
   <% @question.subjects.each do |subject| %>
@@ -23,8 +29,19 @@
 <ol>
   <% @question.options.each do |option| %>
     <li><strong>Option:</strong> <%= option.option %></li>
+    <% if option.option_files.attached? %> <!-- Check if option has files attached -->
+      <% option.option_files.each do |image| %> <!-- Iterate over all option files -->
+        <% if image.content_type.starts_with? 'image' %> <!-- Check if file is an image -->
+          <%= image_tag image, alt: 'Option Image', size: "200x200", class: "option-image" %> <!-- Display image with options -->
+        <% else %>
+          <p>This file is not an image.</p> <!-- Handle non-image file -->
+        <% end %>
+      <% end %>
+    <% end %>
     <li><strong>Is Correct:</strong> <%= option.is_correct ? 'Yes' : 'No' %></li>
   <% end %>
 </ol>
+
+
 
 <%= link_to 'Back', questions_path %>
