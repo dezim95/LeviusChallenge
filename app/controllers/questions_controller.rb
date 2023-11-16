@@ -1,4 +1,24 @@
 class QuestionsController < ApplicationController
+  def subject_ids
+    question_subjects.collect{|o| o.id}
+  end
+
+  def subject_ids= subjects_ids
+    subjects_ids.each do |id|
+      question_subjects << Subject.find(id)
+    end
+  end
+
+  def competency_ids
+    question_competencies.collect{|o| o.id}
+  end
+
+  def competency_ids= competencies_ids
+    competencies_ids.each do |id|
+      question_competencies << Competency.find(id)
+    end
+  end
+
   def index
     @questions = Question.all
   end
@@ -32,11 +52,19 @@ class QuestionsController < ApplicationController
   def question_params
     params.require(:question).permit(
       :author, :topic, :grade, :statement,
-      subject_ids: [],
-      competency_ids: [],
       question_subjects_attributes: [:id, :subject_id],
       question_competencies_attributes: [:id, :competency_id],
-      options_attributes: [:id, :option, :is_correct]
+      options_attributes: [:id, :option, :is_correct],
+      statement_files: [], # Para arquivos relacionados ao statement
+      options_attributes: [:id, :option, :is_correct, :option_files => []], # Para arquivos relacionados às options
+      subject_ids: [], # Atributos adicionais permitidos
+      competency_ids: [] # Atributos adicionais permitidos
+    )
+  end
+
+  def option_params
+    params.require(:option).permit(
+      files: []
     )
   end
 end

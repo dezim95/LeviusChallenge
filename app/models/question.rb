@@ -1,4 +1,5 @@
 class Question < ApplicationRecord
+  has_many_attached :files
   has_many :options
   has_many :question_subjects
   has_many :subjects, through: :question_subjects

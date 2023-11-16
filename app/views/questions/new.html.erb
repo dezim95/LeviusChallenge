@@ -1,9 +1,14 @@
 <%= simple_form_for @question do |form| %>
   <%= form.input :author %>
-
   <%= form.input :topic %>
   <%= form.input :grade %>
   <%= form.input :statement %>
+
+   <!-- Campo de upload de arquivo abaixo do campo 'Statement' -->
+  <div class="field">
+    <%= form.label :statement_files, 'Upload de Arquivos para a Questão' %>
+    <%= form.file_field :statement_files, multiple: true %>
+  </div>
 
   <%= form.simple_fields_for :question_subjects do |subject_form| %>
     <%= 'Matéria(s)' %>
@@ -23,6 +28,12 @@
   <%= form.simple_fields_for :options do |option_form| %>
     <%= option_form.input :option %>
     <%= option_form.input :is_correct, as: :boolean %>
+
+    <!-- Campo de upload de arquivo para cada opção -->
+    <div class="field">
+      <%= option_form.label :option_files, 'Upload de Arquivos para a Opção' %>
+      <%= option_form.file_field :option_files, multiple: true %>
+    </div>
   <% end %>
 
   <%= form.submit 'Create Question', class: 'btn btn-primary' %>
