@@ -1,8 +1,9 @@
+<h1>Nova Questão</h1>
 <%= simple_form_for @question do |form| %>
-  <%= form.input :author %>
-  <%= form.input :topic %>
-  <%= form.input :grade %>
-  <%= form.input :statement %>
+  <%= form.input :author, label: "Autor" %>
+  <%= form.input :topic, label: 'Assunto' %>
+  <%= form.input :grade, label: 'Série' %>
+  <%= form.input :statement, label: "Enunciado" %>
 
    <!-- Campo de upload de arquivo abaixo do campo 'Statement' -->
   <div class="field">
@@ -34,8 +35,8 @@
 
 
   <%= form.simple_fields_for :options do |option_form| %>
-    <%= option_form.input :option %>
-    <%= option_form.input :is_correct, as: :boolean %>
+    <%= option_form.input :option, label: "Opção" %>
+    <%= option_form.input :is_correct, as: :boolean, label: "É resposta" %>
 
     <!-- Campo de upload de arquivo para cada opção -->
     <div class="field">
@@ -44,5 +45,5 @@
     </div>
   <% end %>
 
-  <%= form.submit 'Create Question', class: 'btn btn-primary' %>
+  <%= form.submit 'Criar questão', class: 'btn btn-primary' %>
 <% end %>

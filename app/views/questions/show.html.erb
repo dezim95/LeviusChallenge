@@ -1,31 +1,28 @@
-<h1>Question Details</h1>
+<h1>Detales da questão</h1>
 
-<p><strong>Author:</strong> <%= @question.author %></p>
-<p><strong>Topic:</strong> <%= @question.topic %></p>
-<p><strong>Grade:</strong> <%= @question.grade %></p>
-<p><strong>Statement:</strong> <%= @question.statement %></p>
-<h2>Images</h2>
+<p><strong>Autor:</strong> <%= @question.author %></p>
+<p><strong>Assunto:</strong> <%= @question.topic %></p>
+<p><strong>Série:</strong> <%= @question.grade %></p>
+<p><strong>Enunciado:</strong> <%= @question.statement %></p>
 <% if @question.statement_files.attached? %>
   <% image = @question.statement_files.first %>
   <%= image_tag image, alt: 'Question Image' %>
-<% else %>
-  <p>No images attached to this question.</p>
 <% end %>
-<h2>Subjects</h2>
+<h2>Matérias</h2>
 <ul>
   <% @question.subjects.each do |subject| %>
     <li><%= subject.subject_name %></li>
   <% end %>
 </ul>
 
-<h2>Competencies</h2>
+<h2>Competências</h2>
 <ul>
   <% @question.competencies.each do |competency| %>
     <li><%= competency.competency_name %></li>
   <% end %>
 </ul>
 
-<h2>Options</h2>
+<h2>Opções</h2>
 <ol>
   <% @question.options.each do |option| %>
     <li><strong>Option:</strong> <%= option.option %></li>
