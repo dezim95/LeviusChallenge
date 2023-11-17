@@ -38,7 +38,7 @@ class QuestionsController < ApplicationController
 
   def new
     @question = Question.new
-    @question.options.build
+    4.times { @question.options.build }
     @question.question_subjects.build
     @question.question_competencies.build
   end

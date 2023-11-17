@@ -1,56 +1,93 @@
-<h1>Detales da questão</h1>
+<div class="container mt-5">
+  <h1 class="mb-4">Detalhes da Questão</h1>
 
-<p><strong>Autor:</strong> <%= @question.author %></p>
-<p><strong>Assunto:</strong> <%= @question.topic %></p>
-<p><strong>Série:</strong> <%= @question.grade %></p>
-<p><strong>Enunciado:</strong> <%= @question.statement.html_safe %></p>
-<% if @question.statement_files.attached? %>
-  <% image = @question.statement_files.first %>
-  <%= image_tag image, alt: 'Question Image' %>
-<% end %>
-<h2>Matérias</h2>
-<ul>
-  <% @question.subjects.each do |subject| %>
-    <li><%= subject.subject_name %></li>
-  <% end %>
-</ul>
+  <div class="row">
+    <div class="col-md-6">
+      <div class="card mb-3">
+        <div class="card-body">
+          <h5 class="card-title">Informações Básicas</h5>
+          <p class="card-text"><strong>Autor:</strong> <%= @question.author %></p>
+          <p class="card-text"><strong>Assunto:</strong> <%= @question.topic %></p>
+          <p class="card-text"><strong>Série:</strong> <%= @question.grade %></p>
+        </div>
+      </div>
 
-<h2>Competências</h2>
-<ul>
-  <% @question.competencies.each do |competency| %>
-    <li><%= competency.competency_name %></li>
-  <% end %>
-</ul>
-
-<h2>Opções</h2>
-<ol>
-  <% counter = 0 %>
-  <% @question.options.each do |option| %>
-    <% counter += 1 %>
-    <li>
-      <strong>Option <%= counter %>:</strong> <%= option.option %>
-      <% if option.option_files.attached? %> <!-- Check if option has files attached -->
-        <% option.option_files.each do |image| %> <!-- Iterate over all option files -->
-          <% if image.content_type.starts_with? 'image' %> <!-- Check if file is an image -->
-            <%= image_tag image, alt: 'Option Image', size: "200x200", class: "option-image" %> <!-- Display image with options -->
-          <% elsif image.audio? %>
-            <audio controls>
-              <source src="<%= rails_blob_url(image) %>" type="<%= image.content_type %>"/>
-            </audio>
-          <% elsif image.video? %>
-            <video controls width="480">
-              <source src="<%= rails_blob_url(image) %>" type="<%= image.content_type %>"/>
-            </video>
-          <% else %>
-            <%= link_to image.filename, rails_blob_path(image, disposition: "attachment") %>
+      <div class="card mb-3">
+        <div class="card-body">
+          <h5 class="card-title">Enunciado</h5>
+          <p class="card-text"><%= @question.statement.html_safe %></p>
+          <% if @question.statement_files.attached? %>
+            <% image = @question.statement_files.first %>
+            <%= image_tag image, alt: 'Question Image', class: 'card-img-top img-fluid' %>
           <% end %>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-6">
+      <div class="card mb-3">
+        <div class="card-body">
+          <h5 class="card-title">Matérias</h5>
+          <ul class="list-group list-group-flush">
+            <% @question.subjects.each do |subject| %>
+              <li class="list-group-item"><%= subject.subject_name %></li>
+            <% end %>
+          </ul>
+        </div>
+      </div>
+
+      <div class="card mb-3">
+        <div class="card-body">
+          <h5 class="card-title">Competências</h5>
+          <ul class="list-group list-group-flush">
+            <% @question.competencies.each do |competency| %>
+              <li class="list-group-item"><%= competency.competency_name %></li>
+            <% end %>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card mt-4">
+    <div class="card-body">
+      <h2 class="card-title">Opções</h2>
+      <ol class="list-group list-group-numbered">
+        <% counter = 0 %>
+        <% @question.options.each do |option| %>
+          <% counter += 1 %>
+          <li class="list-group-item">
+            <div class="d-flex justify-content-between align-items-start">
+              <div>
+                <h5 class="mb-0">Opção <%= counter %>:</h5>
+                <p><%= option.option %></p>
+                <% if option.option_files.attached? %>
+                  <% option.option_files.each do |image| %>
+                    <% if image.content_type.starts_with? 'image' %>
+                      <%= image_tag image, width: '400px', alt: 'Option Image', class: 'img-fluid option-image mb-2' %>
+                    <% elsif image.audio? %>
+                      <audio controls class="mb-2">
+                        <source src="<%= rails_blob_url(image) %>" type="<%= image.content_type %>"/>
+                      </audio>
+                    <% elsif image.video? %>
+                      <video controls width="100%" class="mb-2">
+                        <source src="<%= rails_blob_url(image) %>" type="<%= image.content_type %>"/>
+                      </video>
+                    <% else %>
+                      <%= link_to image.filename, rails_blob_path(image, disposition: 'attachment') %>
+                    <% end %>
+                  <% end %>
+                <% end %>
+              </div>
+              <div class="text-end">
+                <strong>Correta:</strong> <%= option.is_correct ? 'Sim' : 'Não' %>
+              </div>
+            </div>
+          </li>
         <% end %>
-      <% end %>
-      <strong>Is Correct:</strong> <%= option.is_correct ? 'Yes' : 'No' %>
-    </li>
-  <% end %>
-</ol>
+      </ol>
+    </div>
+  </div>
 
-
-
-<%= link_to 'Back', questions_path %>
+  <a href="<%= questions_path %>" class="btn btn-primary mt-3">Voltar</a>
+</div>

@@ -2,70 +2,132 @@
 <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
 <script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
 
-<h1>Nova Questão</h1>
-
-<%= simple_form_for @question do |form| %>
-  <%= form.input :author, label: "Autor" %>
-  <%= form.input :topic, label: 'Assunto' %>
-  <%= form.input :grade, label: 'Série' %>
-  <p>Enunciado</p>
-  <!-- Initialize Quill editor -->
-  <div id="editor" style="height: 200px;">
-    <%= form.object.statement %>
-  </div>
-
-  <!-- This hidden field will actually send the data -->
-  <%= form.input :statement, as: :hidden %>
-
-  <!-- Campo de upload de arquivo abaixo do campo 'Statement' -->
-  <div class="field">
-    <%= form.label :statement_files, 'Upload de Arquivos para a Questão' %>
-    <%= form.file_field :statement_files, multiple: true %>
-  </div>
-
-  <%= form.simple_fields_for :question_subjects do |subject_form| %>
-    <%= 'Matéria(s)' %>
-    <br>
-     <%= form.collection_check_boxes :subject_ids, Subject.all, :id, :subject_name do |cb| %>
-      <%= cb.check_box %>
-      <%= cb.label %>
-      <br>
-    <% end %>
-    <br>
-  <% end %>
-
-   <%= form.simple_fields_for :question_competencies do |competency_form| %>
-    <%= 'Competencia(s)' %>
-    <br>
-     <%= form.collection_check_boxes :competency_ids, Competency.all, :id, :competency_name do |cb| %>
-      <%= cb.check_box %>
-      <%= cb.label %>
-      <br>
-    <% end %>
-    <br>
-  <% end %>
-
-  <%= form.simple_fields_for :options do |option_form| %>
-    <%= option_form.input :option, label: "Opção" %>
-    <%= option_form.input :is_correct, as: :boolean, label: "É resposta" %>
-
-    <!-- Campo de upload de arquivo para cada opção -->
-    <div class="field">
-      <%= option_form.label :option_files, 'Upload de Arquivos para a Opção' %>
-      <%= option_form.file_field :option_files, multiple: true %>
+<%= simple_form_for @question, html: { class: 'needs-validation' } do |form| %>
+  <div class="container">
+    <h1 class="mt-4">Nova Questão</h1>
+    <div class="row">
+      <div class="col-md-6">
+        <%= form.input :author, label: 'Autor', class: 'form-control mb-3' %>
+        <%= form.input :topic, label: 'Assunto', class: 'form-control mb-3' %>
+        <%= form.input :grade, label: 'Série', class: 'form-control mb-3' %>
+      </div>
+      <div class="col-md-6">
+        <p>Enunciado</p>
+        <div id="editor" style="height: 200px;"></div>
+        <%= form.input :statement, as: :hidden %>
+        <div class="form-group">
+          <%= form.label :statement_files, 'Upload de Arquivos para o enunciado' %>
+          <%= form.file_field :statement_files, multiple: true, class: 'form-control-file' %>
+        </div>
+      </div>
     </div>
-  <% end %>
 
-  <%= form.submit 'Criar questão', class: 'btn btn-primary' %>
+    <div class="row">
+      <div class="col-md-3 card mx-2">
+        <%= form.simple_fields_for :question_subjects do |subject_form| %>
+          <%= 'Matéria(s)' %>
+          <br>
+          <%= form.collection_check_boxes :subject_ids, Subject.all, :id, :subject_name do |cb| %>
+            <%= cb.check_box %>
+            <%= cb.label %>
+            <br>
+          <% end %>
+          <br>
+        <% end %>
+      </div>
+      <div class="col-md-3 card">
+        <%= form.simple_fields_for :question_competencies do |competency_form| %>
+          <%= 'Competencia(s)' %>
+          <br>
+          <%= form.collection_check_boxes :competency_ids, Competency.all, :id, :competency_name do |cb| %>
+            <%= cb.check_box %>
+            <%= cb.label %>
+            <br>
+          <% end %>
+          <br>
+        <% end %>
+      </div>
+    </div>
+
+    <!-- Opções -->
+    <div class="options-container mt-4">
+      <%= form.simple_fields_for :options do |option_form| %>
+        <div class="option-fields border p-3 mb-3">
+          <%= option_form.input :option, label: 'Opção', class: 'form-control mb-2' %>
+          <%= option_form.input :is_correct, as: :boolean, label: 'É resposta', class: 'form-check-input' %>
+
+          <!-- Campo de upload de arquivo para cada opção -->
+          <div class="form-group">
+            <%= option_form.label :option_files, 'Upload de Arquivos para a Opção' %>
+            <%= option_form.file_field :option_files, multiple: true, class: 'form-control-file' %>
+          </div>
+
+          <!-- Botão para remover a opção -->
+          <%= button_tag 'Remover Opção', class: 'btn btn-danger remove-option mt-2', type: 'button' %>
+        </div>
+      <% end %>
+    </div>
+
+    <!-- Botão para adicionar nova opção -->
+    <%= button_tag 'Adicionar Opção', class: 'btn btn-success add-option', type: 'button' %>
+
+    <%= form.submit 'Criar questão', class: 'btn btn-primary mt-3 mb-3' %>
+  </div>
 <% end %>
 
 <script>
-  var quill = new Quill('#editor', {
-    theme: 'snow'
+  document.addEventListener('DOMContentLoaded', function() {
+    var quill = new Quill('#editor', {
+      theme: 'snow'
+    });
+
+    // Função para adicionar nova opção
+    function addOption() {
+  var optionsContainer = document.querySelector('.options-container');
+  var newOptionFields = document.querySelector('.option-fields').cloneNode(true);
+
+  // Atualize os nomes dos campos de arquivo para cada nova opção
+  var fileFields = newOptionFields.querySelectorAll('input[type="file"]');
+  fileFields.forEach(function(fileField) {
+    var newIndex = optionsContainer.querySelectorAll('.option-fields').length; // Novo índice para a opção
+    var inputName = fileField.getAttribute('name');
+    var updatedInputName = inputName.replace(/\[\d\]/, '[' + newIndex + ']');
+    fileField.setAttribute('name', updatedInputName);
   });
 
-  document.querySelector('form').addEventListener('submit', function() {
-    var statementInput = document.querySelector('input[name="question[statement]"]');
-    statementInput.value = quill.root.innerHTML;
+  optionsContainer.appendChild(newOptionFields);
+}
+
+    // Função para remover a opção
+    function removeOption(event) {
+      var optionFields = event.target.closest('.option-fields');
+      optionFields.remove();
+    }
+
+    // Adicionar evento ao botão "Adicionar Opção"
+    document.querySelector('.add-option').addEventListener('click', addOption);
+
+    // Adicionar evento delegado para o botão "Remover Opção"
+    document.querySelector('.options-container').addEventListener('click', function(event) {
+      if (event.target.classList.contains('remove-option')) {
+        removeOption(event);
+      }
+    });
+
+    document.querySelector('form').addEventListener('submit', function() {
+      var statementInput = document.querySelector('input[name="question[statement]"]');
+      statementInput.value = quill.root.innerHTML;
+
+      // Atualizar os campos de opções no formulário antes de enviar
+      var optionsContainer = document.querySelector('.options-container');
+      var optionFields = optionsContainer.querySelectorAll('.option-fields');
+
+      optionFields.forEach(function(option, index) {
+        var inputPrefix = 'question[options_attributes][' + index + ']';
+        option.querySelector('input[name$="[option]"]').setAttribute('name', inputPrefix + '[option]');
+        option.querySelector('input[name$="[is_correct]"]').setAttribute('name', inputPrefix + '[is_correct]');
+        option.querySelector('input[name$="[option_files][]"]').setAttribute('name', inputPrefix + '[option_files][]');
+      });
+    });
   });
 </script>
